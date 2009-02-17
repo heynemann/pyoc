@@ -1,0 +1,36 @@
+Metadata-Version: 1.0
+Name: PyoC
+Version: 0.1dev-r894
+Summary: PyoC is an IoC container for Python projects
+Home-page: http://www.pyoc.org
+Author: Bernardo Heynemann
+Author-email: heynemann@gmail.com
+License: OSI
+Description: ============
+        Introduction
+        ============
+        PyoC is an IoC container for Python. It's purpose is to make it even easier (it's easy already in Python) to manage dependencies between components.
+        
+        It's heavily oriented towards a Convention-over-Configuration approach.
+        
+        ===================
+        Project Cheat Sheet
+        ===================
+        
+        Project Google Groups Page - http://groups.google.com/group/pythonioc
+        
+        Project Conventions: http://groups.google.com/group/pythonioc/web/conventions
+        
+        Links and Blog Posts: http://groups.google.com/group/pythonioc/web/Links%20and%20Blog%20Posts
+        
+        Project JIRA (Issue and Version Management) -
+        http://jira.stormwindproject.org:8080/browse/PYOC
+        
+        Project Subversion Server: http://svn.stormwindproject.org/svn/PyoC/Trunk/ (``svn
+        co http://svn.stormwindproject.org/svn/PyoC/Trunk/ PyoC``)
+        
+        **PyPI Page**: -
+        
+        **Docs for current version**: -
+Keywords: IoC Dependency Injection
+Platform: UNKNOWN

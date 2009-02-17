@@ -1,0 +1,17 @@
+MANIFEST.in
+setup.cfg
+setup.py
+PyoC.egg-info/PKG-INFO
+PyoC.egg-info/SOURCES.txt
+PyoC.egg-info/dependency_links.txt
+PyoC.egg-info/entry_points.txt
+PyoC.egg-info/top_level.txt
+PyoC.egg-info/zip-safe
+pyoc/__init__.py
+pyoc/common.py
+pyoc/config.py
+pyoc/errors.py
+pyoc/ioc.py
+tests/__init__.py
+tests/base_test.py
+tests/test_resolve_dependency.py
