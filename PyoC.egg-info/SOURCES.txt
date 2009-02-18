@@ -21,8 +21,14 @@ pyoc/errors.py
 pyoc/ioc.py
 tests/__init__.py
 tests/base_test.py
+tests/pyoc_config.py
+tests/test1_config.py
+tests/test2_config.py
+tests/test3_config.py
+tests/test_different_lifestyle_types.py
 tests/test_resolve_dependency.py
 tests/test_resolve_many_files_dependency.py
+tests/test_resolve_with_file_config.py
 tests/test_classes/__init__.py
 tests/test_classes/a_action.py
 tests/test_classes/d_action.py
