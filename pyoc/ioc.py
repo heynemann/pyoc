@@ -47,6 +47,11 @@ class IoC:
         container.instances[cls] = instance
         return instance
     
+    @staticmethod
+    def resolve_all(property, *args, **kwargs):
+        container = IoC.get_instance()
+        return container._instantiate_all(property, args, kwargs)
+    
     def _instantiate(self, name, factory, factory_args, factory_kw):
         if not callable(factory):
             logging.debug("Property %r: %s", name, factory)
@@ -62,6 +67,19 @@ class IoC:
             
         return factory(*factory_args, **kwargs)
     
+    def _instantiate_all(self, property, factory_args, factory_kw):
+        all_instances = []
+        if property not in self.config.components:
+            raise KeyError("No indirect component for: %s", property)
+        if self.config.components[property][0]!="indirect":
+            raise KeyError("No indirect component for: %s", property)
+
+        for cls in self.config.components[property][1]:
+            instance = self._instantiate("", cls, factory_args, factory_kw)
+            all_instances.append(instance)
+            
+        return all_instances
+    
     def _get(self, property, factory, factory_args, factory_kw):
         """Lookups the given property name in context.
         Raises KeyError when no such property is found.
@@ -72,10 +90,11 @@ class IoC:
         if property in self.instances:
             return self.instances[property]
 
-        component, args, kwargs = self.config.components[property]
+        component_type, component, args, kwargs = self.config.components[property]
         
-        #args = args + factory_args
         kwargs = merge_dicts(factory_kw, kwargs)
+        
+        if component_type == "indirect": return self.instantiate_all(property, *args, **kwargs)
         
         instance = self._instantiate(property, *(component, args, kwargs))
         self.instances[property] = instance

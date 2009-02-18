@@ -2,7 +2,7 @@ from base_test import *
 from pyoc.config import *
 from pyoc.errors import *
 
-class TestResolveDependencies(BaseTest):
+class TestResolveDependency(BaseTest):
     
     def test_should_resolve_dependency(self):
         expected_title = "some weird title"

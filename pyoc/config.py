@@ -1,5 +1,6 @@
 from common import *
 from errors import *
+import sys
 
 class BaseConfig(object):
     def __init__(self):
@@ -31,4 +32,25 @@ class InPlaceConfig(BaseConfig):
                     % (property, component, args, kwargs))
 
         if callable(component): self.assert_not_cyclical_dependency(property, component)
-        self.components[property] = component, args, kwargs
+        self.components[property] = "direct", component, args, kwargs
+
+    def register_files(self, property, root_path, pattern):
+        all_classes = []
+        for module_path in locate("*_action.py", root=root_path):
+            module_name = os.path.splitext(os.path.split(module_path)[-1])[0]
+            sys.path.insert(0,os.path.abspath(root_path))
+            
+            module = __import__(module_name)
+            
+            class_name = camel_case(module.__name__)
+            cls = getattr(module, class_name, None)
+            
+            if cls == None:
+                raise AttributeError("The class %s could not be found in file %s. Please make sure that the class has the same name as the file, but Camel Cased."
+                                     % (class_name, module_name))
+            
+            all_classes.append(cls)
+            
+        
+        self.components[property] = "indirect", all_classes, None, None
+        
