@@ -37,7 +37,6 @@ class IoC:
                                            #This way B gets built using the overriden title instead 
                                            #of the one configured in the IoC container. This is useful to create custom instances.
                                            #Notice that if your instance has already been loaded before with a different value you need to call IoC.reset()
-        
         """
         container = IoC.get_instance()
         if getattr(container, "config", None) == None:
