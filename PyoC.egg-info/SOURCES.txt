@@ -1,4 +1,5 @@
 MANIFEST.in
+release_to_pypi.bat
 setup.cfg
 setup.py
 PyoC.egg-info/PKG-INFO

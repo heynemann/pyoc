@@ -1,5 +1,6 @@
 from base_test import *
 from pyoc.config import *
+from pyoc.errors import *
 
 class TestResolveDependencies(BaseTest):
     
@@ -84,12 +85,11 @@ class TestResolveDependencies(BaseTest):
         
         config = InPlaceConfig()
         config.register("parent", CyclicalParent)
-        config.register("child", CyclicalChild)
-        config.register("title", expected_title)
+        self.assertRaises(CyclicalDependencyError, config.register, "child", CyclicalChild)
+        #config.register("child", CyclicalChild)
+        #config.register("title", expected_title)
         
-        IoC.configure(config)
-        
-        self.assertRaises(CyclicalDependencyError, IoC.resolve, CyclicalParent)
+        #IoC.configure(config)
 
         #self.assertNotEqual(parent, None)
         #self.assertNotEqual(parent.child, None)
