@@ -33,7 +33,11 @@ co http://svn.stormwindproject.org/svn/PyoC/Trunk/ PyoC``)
 **PyPI Page**: -
 
 **Docs for current version**: -""",
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=["Development Status :: 2 - Pre-Alpha",
+				   "Intended Audience :: Developers",
+				   "License :: OSI Approved",
+				   "Natural Language :: English",
+				   "Programming Language :: Python :: 2.5",], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='IoC Dependency Injection',
       author='Bernardo Heynemann',
       author_email='heynemann@gmail.com',
