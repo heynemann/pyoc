@@ -17,7 +17,6 @@ class IoC:
     def get_instance():
         if IoC.__instance == None:
             IoC.__instance = IoC()
-            
         return IoC.__instance
     
     @staticmethod
@@ -41,6 +40,11 @@ class IoC:
         container = IoC.get_instance()
         if getattr(container, "config", None) == None:
             raise ConfigureError("The container has not yet been configured. Try calling IoC.configure first passing a valid configure source.")
+        
+        if container.config.components.has_key(cls):
+            component_type, lifestyle_type, all_classes, args, kwargs = container.config.components[cls]
+            if (cls in container.instances and lifestyle_type == "singleton"):
+                return container.instances[cls]
         
         instance = container._instantiate("", cls, args, kwargs)
         container.instances[cls] = instance
@@ -73,10 +77,18 @@ class IoC:
         if self.config.components[property][0]!="indirect":
             raise KeyError("No indirect component for: %s", property)
 
-        for cls in self.config.components[property][1]:
+        component_type, lifestyle_type, all_classes, args, kwargs = self.config.components[property]
+
+        if (property in self.instances and lifestyle_type == "singleton"):
+            return self.instances[property]
+        
+        for cls in all_classes:
             instance = self._instantiate("", cls, factory_args, factory_kw)
             all_instances.append(instance)
-            
+        
+        if lifestyle_type == "singleton": 
+            self.instances[property] = all_instances
+        
         return all_instances
     
     def _get(self, property, factory, factory_args, factory_kw):
@@ -86,17 +98,21 @@ class IoC:
         if property not in self.config.components:
             raise KeyError("No factory for: %s", property)
 
-        if property in self.instances:
+        component_type, lifestyle_type, component, args, kwargs = self.config.components[property]
+
+        if (property in self.instances and lifestyle_type == "singleton"):
             return self.instances[property]
 
-        component_type, component, args, kwargs = self.config.components[property]
-        
+        if (component in self.instances and lifestyle_type == "singleton"):
+            return self.instances[component]
+
         kwargs = merge_dicts(factory_kw, kwargs)
         
         if component_type == "indirect": return self.instantiate_all(property, *args, **kwargs)
         
         instance = self._instantiate(property, *(component, args, kwargs))
         self.instances[property] = instance
+        self.instances[component] = instance
         return instance
 
 

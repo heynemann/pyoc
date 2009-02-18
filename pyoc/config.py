@@ -3,11 +3,24 @@ from errors import *
 import sys
 
 class BaseConfig(object):
-    def __init__(self):
+    allowed_lifestyle_types = ("transient", "singleton",)
+    
+    def __init__(self, lifestyle_type = "singleton"):
         """Creates empty context.
         """
         self.components = {}
-    
+        self.assert_valid_lifestyle_type(lifestyle_type)
+        self.default_lifestyle_type = lifestyle_type
+        
+    def set_default_lifestyle_type(self, lifestyle_type):
+        self.assert_valid_lifestyle_type(lifestyle_type)
+        self.default_lifestyle_type = lifestyle_type
+        
+    def assert_valid_lifestyle_type(self, lifestyle_type):
+        if lifestyle_type not in BaseConfig.allowed_lifestyle_types:
+            raise InvalidLifestyleTypeError("The specified lifestyle type (%s) is not valid. Allowed lifestyle types: %s" %
+                                            (lifestyle_type, ",".join(BaseConfig.allowed_lifestyle_types)))
+        
     def assert_not_cyclical_dependency(self, property, component):
         component_args = get_argdefaults(component).keys()
         for component_arg in component_args:
@@ -18,16 +31,24 @@ class BaseConfig(object):
                     raise CyclicalDependencyError("There is a cyclical dependency between %s and %s. Cyclical dependencies are not supported yet!"
                                                   % (component.__name__, parent_component.__name__))
                 
-    def register(self, property, component, *args, **kwargs):
+    def register(self, property, component, lifestyle_type = "UNKNOWN", *args, **kwargs):
+        if (lifestyle_type == "UNKNOWN"): lifestyle_type = self.default_lifestyle_type
+        self.assert_valid_lifestyle_type(lifestyle_type)        
+        
         if (args or kwargs) and not callable(component):
             raise ValueError(
                     "Only callable component supports extra args: %s, %s(%s, %s)"
                     % (property, component, args, kwargs))
 
         if callable(component): self.assert_not_cyclical_dependency(property, component)
-        self.components[property] = "direct", component, args, kwargs
+        component_definition = ("direct", lifestyle_type, component, args, kwargs,)
+        self.components[property] = component_definition
+        if callable(component): self.components[component] = component_definition
 
-    def register_files(self, property, root_path, pattern):
+    def register_files(self, property, root_path, pattern, lifestyle_type = "UNKNOWN"):
+        if (lifestyle_type == "UNKNOWN"): lifestyle_type = self.default_lifestyle_type
+        self.assert_valid_lifestyle_type(lifestyle_type)        
+        
         all_classes = []
         for module_path in locate("*_action.py", root=root_path):
             module_name = os.path.splitext(os.path.split(module_path)[-1])[0]
@@ -44,7 +65,8 @@ class BaseConfig(object):
             
             all_classes.append(cls)
         
-        self.components[property] = "indirect", all_classes, None, None
+        component_definition = "indirect", lifestyle_type, all_classes, None, None
+        self.components[property] = component_definition
 
 class InPlaceConfig(BaseConfig):
     '''
