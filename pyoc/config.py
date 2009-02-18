@@ -1,4 +1,5 @@
-from common import *
+import common
+import os
 from errors import *
 import sys
 
@@ -22,11 +23,11 @@ class BaseConfig(object):
                                             (lifestyle_type, ",".join(BaseConfig.allowed_lifestyle_types)))
         
     def assert_not_cyclical_dependency(self, property, component):
-        component_args = get_argdefaults(component).keys()
+        component_args = common.get_argdefaults(component).keys()
         for component_arg in component_args:
             if self.components.has_key(component_arg):
-                parent_component = self.components[component_arg][0]
-                parent_args = get_argdefaults(parent_component).keys()
+                parent_component = self.components[component_arg][2]
+                parent_args = common.get_argdefaults(parent_component).keys()
                 if property in parent_args:
                     raise CyclicalDependencyError("There is a cyclical dependency between %s and %s. Cyclical dependencies are not supported yet!"
                                                   % (component.__name__, parent_component.__name__))
@@ -50,13 +51,13 @@ class BaseConfig(object):
         self.assert_valid_lifestyle_type(lifestyle_type)        
         
         all_classes = []
-        for module_path in locate("*_action.py", root=root_path):
+        for module_path in common.locate("*_action.py", root=root_path):
             module_name = os.path.splitext(os.path.split(module_path)[-1])[0]
             sys.path.insert(0,os.path.abspath(root_path))
             
             module = __import__(module_name)
             
-            class_name = camel_case(module.__name__)
+            class_name = common.camel_case(module.__name__)
             cls = getattr(module, class_name, None)
             
             if cls == None:
