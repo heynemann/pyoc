@@ -45,6 +45,13 @@ class BaseConfig(object):
         component_definition = ("direct", lifestyle_type, component, args, kwargs,)
         self.components[property] = component_definition
         if callable(component): self.components[component] = component_definition
+        
+    def register_instance(self, property, instance, lifestyle_type = "UNKNOWN"):
+        if (lifestyle_type == "UNKNOWN"): lifestyle_type = self.default_lifestyle_type
+        self.assert_valid_lifestyle_type(lifestyle_type)
+        
+        component_definition = ("instance", lifestyle_type, instance, None, None,)
+        self.components[property] = component_definition
 
     def register_files(self, property, root_path, pattern, lifestyle_type = "UNKNOWN"):
         if (lifestyle_type == "UNKNOWN"): lifestyle_type = self.default_lifestyle_type

@@ -42,7 +42,9 @@ class IoC:
             raise ConfigureError("The container has not yet been configured. Try calling IoC.configure first passing a valid configure source.")
         
         if container.config.components.has_key(cls):
-            component_type, lifestyle_type, all_classes, args, kwargs = container.config.components[cls]
+            component_type, lifestyle_type, value, args, kwargs = container.config.components[cls]
+            if component_type == "instance":
+                return value
             if (cls in container.instances and lifestyle_type == "singleton"):
                 return container.instances[cls]
         
@@ -100,6 +102,8 @@ class IoC:
 
         component_type, lifestyle_type, component, args, kwargs = self.config.components[property]
 
+        if component_type == "instance": return component
+        
         if (property in self.instances and lifestyle_type == "singleton"):
             return self.instances[property]
 

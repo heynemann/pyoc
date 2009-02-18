@@ -28,7 +28,7 @@ def _getargspec(factory):
         factory = factory.__init__
 
     #logging.debug("Inspecting %r", factory)
-    print "Inspecting %r" % factory
+    
     args, vargs, vkw, defaults = inspect.getargspec(factory)
     if inspect.ismethod(factory):
         args = args[1:]
