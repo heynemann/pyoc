@@ -17,14 +17,7 @@ class BaseConfig(object):
                 if property in parent_args:
                     raise CyclicalDependencyError("There is a cyclical dependency between %s and %s. Cyclical dependencies are not supported yet!"
                                                   % (component.__name__, parent_component.__name__))
-        
-
-class InPlaceConfig(BaseConfig):
-
-    def __init__(self):
-        super(InPlaceConfig, self).__init__()
-
-    
+                
     def register(self, property, component, *args, **kwargs):
         if (args or kwargs) and not callable(component):
             raise ValueError(
@@ -50,7 +43,43 @@ class InPlaceConfig(BaseConfig):
                                      % (class_name, module_name))
             
             all_classes.append(cls)
-            
         
         self.components[property] = "indirect", all_classes, None, None
-        
+
+class InPlaceConfig(BaseConfig):
+    '''
+    Creates a blank configuration for code configuration.
+    Pretty useful for unit testing the container and dependencies.
+    '''
+    def __init__(self):
+        super(InPlaceConfig, self).__init__()
+    
+class FileConfig(BaseConfig):
+    '''
+    Creates a container using the definitions in the specified file.
+    The file MUST be a python module and MUST declara a "def config(container):" function.
+    This is the function that will configure the container.
+    
+    Default file is pyoc_config.py.
+    '''
+    def __init__(self, filename = "pyoc_config.py", root_path=os.path.abspath(os.curdir)):
+        super(FileConfig, self).__init__()
+        self.execute_config_file(root_path, filename)
+    
+    def execute_config_file(self, root_path, filename):
+        sys.path.insert(0,root_path)
+        module_name = os.path.splitext(filename)[0]
+        module = __import__(module_name)
+        func = getattr(module, "config")
+        config_helper = FileConfig.ContainerConfigHelper(self)
+        func(config_helper)
+    
+    class ContainerConfigHelper(object):
+        def __init__(self, file_config):
+            self.file_config = file_config
+            
+        def register(self, property, component, *args, **kwargs):
+            self.file_config.register(property, component, *args, **kwargs)
+            
+        def register_files(self, property, root_path, pattern):
+            self.file_config.register_files(property, root_path, pattern)

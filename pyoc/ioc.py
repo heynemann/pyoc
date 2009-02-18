@@ -112,7 +112,8 @@ class IoC:
             elif arg in self.config.components:
                 defaults[arg] = self._get(arg, factory, factory_args, factory_kw)
             elif default is NO_DEFAULT:
-                raise KeyError("No factory for arg: %s" % arg)
+                raise KeyError("Argument %s in class %s's constructor was not found! Did you forget to register it in the container, or to pass it as a named argument?" 
+                               % (arg, factory.__name__))
 
         defaults.update(factory_kw)
         return defaults
