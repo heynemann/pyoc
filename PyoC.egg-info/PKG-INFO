@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: PyoC
-Version: 0.1dev-r907
+Version: 0.1dev-r908
 Summary: PyoC is an IoC container for Python projects
 Home-page: http://www.pyoc.org
 Author: Bernardo Heynemann
@@ -9,9 +9,106 @@ License: OSI
 Description: ============
         Introduction
         ============
-        PyoC is an IoC container for Python. It's purpose is to make it even easier (it's easy already in Python) to manage dependencies between components.
+        This is the groups page for PyoC. This group's purpose is to discuss new features in PyoC and to have an open channel between users and developers in the project.
         
-        It's heavily oriented towards a Convention-over-Configuration approach.
+        PyoC is an IoC container for Python. It's purpose is to make it even easier (it's easy already in Python) to manage dependencies between components. It's heavily oriented towards a Convention-over-Configuration approach.
+        
+        =================
+        PyoC Architecture
+        =================
+        
+        Lets try to understand how PyoC works and what's the concept behind it.
+        
+        First let's look at a picture since it's more than a thousand words! :)
+        
+        .. image:: http://farm4.static.flickr.com/3528/3289725178_cd201f8e85.jpg?v=0
+        
+        In the above diagram you can see two main aspects of PyoC.
+        
+        The first one is the configuration, which is responsible for making sure the container understands your dependencies. As you can see in the picture you can use the ConfigurationFactory that's more convenient to you. PyoC ships with InPlaceConfig and FileConfig (as of version 0.1).
+        
+        The second one is the dependencies resolution. The great thing about an IoC container is that it takes cares of boring infrastructure code for you, like instantiating classes, managing dependencies between them, etc. It also enables more advanced scenarios where you can hotswap one implementation for another without changing your code whatsoever.
+        
+        Let's take the given dependency diagram in the picture. It would translate roughly to this code::
+        
+        class A(object):
+        def __init__(self, b, c, d):
+        #assigns and does something
+        
+        class B(object):
+        def __init__(self, e):
+        #assigns and does something
+        
+        class C(object):
+        def __init__(self, e):
+        #assigns and does something
+        
+        class D(object):
+        def __init__(self, f):
+        #assigns and does something
+        
+        class E(object):
+        def __init__(self, g):
+        #assigns and does something
+        
+        class F(object):
+        def __init__(self, h):
+        #assigns and does something
+        
+        class G(object):
+        def __init__(self, some_param):
+        #assigns and does something
+        
+        class H(object):
+        def __init__(self, some_param):
+        #assigns and does something
+        
+        Wow, that's a deep structure. Well, not quite. If you really dig into how components interact in your application you'll soon realize that this is a very simplistic representation. Nevertheless, let's create an instance of class A.
+        
+        ``a = A(b, c, d)``
+        
+        Hmm... Wait... We don't have b, c and d yet. Let's improve to create that::
+        
+        b = B(e)
+        c = C(e)
+        a = A(b, c, d)
+        
+        Ops, we don't have e... You see where I'm going, right?
+        
+        Here is the full version of the code to get A::
+        
+        h = H("some message")
+        f = F(h)
+        d = D(f)
+        g = G("some message")
+        e = E(g)
+        b = B(e)
+        c = C(e)
+        a = A(b, c, d)
+        
+        That doesn't look good does it? What if you could do::
+        
+        a = IoC.resolve(A)
+        
+        That's not magic my friend. That's PyoC. What you see above is the mechanism of dependency resolution working. PyoC can create the instances and fill their dependencies for you based on the configuration you do.
+        
+        Wait? What? Oh, you are right! I never showed any configuration.
+        
+        Let's check an InPlaceConfig for the above scenario::
+        
+        config = InPlaceConfig()
+        config.register("b", B)
+        config.register("c", C)
+        config.register("d", D)
+        config.register("e", E)
+        config.register("f", F)
+        config.register("g", G)
+        config.register("h", H)
+        
+        "You're kidding, right?"
+        Not really, my dear reader. That's pretty much it. As long as your classes use the property name specified in the first argument of the register function as the argument name in their constructors, you're good.
+        
+        I know that's quite a lot to digest. More is coming soon as blog posts / documentation. The best place to look for examples right now is in the Test Cases that you can find in the source code.
         
         ===================
         Project Cheat Sheet
@@ -29,7 +126,7 @@ Description: ============
         Project Subversion Server: http://svn.stormwindproject.org/svn/PyoC/Trunk/ (``svn
         co http://svn.stormwindproject.org/svn/PyoC/Trunk/ PyoC``)
         
-        **PyPI Page**: -
+        **PyPI Page**: http://pypi.python.org/pypi/PyoC/
         
         **Docs for current version**: -
 Keywords: IoC Dependency Injection

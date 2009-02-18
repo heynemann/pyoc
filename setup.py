@@ -30,7 +30,7 @@ The first one is the configuration, which is responsible for making sure the con
 
 The second one is the dependencies resolution. The great thing about an IoC container is that it takes cares of boring infrastructure code for you, like instantiating classes, managing dependencies between them, etc. It also enables more advanced scenarios where you can hotswap one implementation for another without changing your code whatsoever.
 
-Let´s take the given dependency diagram in the picture. It would translate roughly to this code::
+Let's take the given dependency diagram in the picture. It would translate roughly to this code::
 
     class A(object):
         def __init__(self, b, c, d):
@@ -68,7 +68,7 @@ Wow, that's a deep structure. Well, not quite. If you really dig into how compon
 
 ``a = A(b, c, d)``
 
-Hmm... Wait... We don´t have b, c and d yet. Let's improve to create that::
+Hmm... Wait... We don't have b, c and d yet. Let's improve to create that::
 
     b = B(e)
     c = C(e)
@@ -95,7 +95,7 @@ That's not magic my friend. That's PyoC. What you see above is the mechanism of 
 
 Wait? What? Oh, you are right! I never showed any configuration.
 
-Let´s check an InPlaceConfig for the above scenario::
+Let's check an InPlaceConfig for the above scenario::
 
     config = InPlaceConfig()
     config.register("b", B)
@@ -106,10 +106,12 @@ Let´s check an InPlaceConfig for the above scenario::
     config.register("g", G)
     config.register("h", H)
 
-"You´re kidding, right?" 
+"You're kidding, right?" 
 Not really, my dear reader. That's pretty much it. As long as your classes use the property name specified in the first argument of the register function as the argument name in their constructors, you're good.
 
-I know that's quite a lot to digest. More is coming soon as blog posts / documentation. The best place to look for examples right now is in the Test Cases that you can find in the source code.
+I know that's quite a lot to digest. More is coming soon as blog posts / documentation. 
+
+**The best place to look for examples right now is in the Test Cases that you can find in the source code.**
 
 ===================
 Project Cheat Sheet
