@@ -27,6 +27,7 @@ tests/test2_config.py
 tests/test3_config.py
 tests/test_different_lifestyle_types.py
 tests/test_resolve_dependency.py
+tests/test_resolve_instance.py
 tests/test_resolve_many_files_dependency.py
 tests/test_resolve_with_file_config.py
 tests/test_classes/__init__.py

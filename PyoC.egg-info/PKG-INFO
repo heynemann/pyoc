@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: PyoC
-Version: 0.1dev-r908
+Version: 0.1dev-r910
 Summary: PyoC is an IoC container for Python projects
 Home-page: http://www.pyoc.org
 Author: Bernardo Heynemann
@@ -108,7 +108,9 @@ Description: ============
         "You're kidding, right?"
         Not really, my dear reader. That's pretty much it. As long as your classes use the property name specified in the first argument of the register function as the argument name in their constructors, you're good.
         
-        I know that's quite a lot to digest. More is coming soon as blog posts / documentation. The best place to look for examples right now is in the Test Cases that you can find in the source code.
+        I know that's quite a lot to digest. More is coming soon as blog posts / documentation.
+        
+        **The best place to look for examples right now is in the Test Cases that you can find in the source code.**
         
         ===================
         Project Cheat Sheet
