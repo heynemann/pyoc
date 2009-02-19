@@ -107,6 +107,9 @@ class IoC:
         if (property in self.instances and lifestyle_type == "singleton"):
             return self.instances[property]
 
+        if isinstance(component, (tuple, list, dict, set)):
+            return component
+        
         if (component in self.instances and lifestyle_type == "singleton"):
             return self.instances[component]
 
@@ -125,7 +128,7 @@ class IoC:
         The factory_kw could specify explicit keyword values.
         """
         defaults = get_argdefaults(factory, len(factory_args))
-
+		
         for arg, default in defaults.iteritems():
             if arg in factory_kw:
                 continue

@@ -26,7 +26,8 @@ class BaseConfig(object):
         component_args = common.get_argdefaults(component).keys()
         for component_arg in component_args:
             if self.components.has_key(component_arg):
-                parent_component = self.components[component_arg][2]
+                parent_component_type, parent_lifestyle_type, parent_component, parent_args, parent_kwargs = self.components[component_arg]
+                if parent_component_type == "instance": return
                 parent_args = common.get_argdefaults(parent_component).keys()
                 if property in parent_args:
                     raise CyclicalDependencyError("There is a cyclical dependency between %s and %s. Cyclical dependencies are not supported yet!"

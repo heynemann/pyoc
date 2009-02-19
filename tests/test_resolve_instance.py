@@ -22,6 +22,23 @@ class TestResolveInstance(BaseTest):
         self.assertEqual("other title", a.b.title)
         self.assertEqual(expected_title, a.c.title)
         
+    def test_should_resolve_instance_dependency(self):
+        expected_title = "some weird title"
+        
+        config = InPlaceConfig()
+        some_f = F("other title")
+        config.register("e", E)
+        config.register_instance("f", some_f)
+        
+        IoC.configure(config)
+        d = IoC.resolve(D)
+        
+        self.assertNotEqual(d, None)
+        self.assertNotEqual(d.e, None)
+        self.assertNotEqual(d.e.f, None)
+        self.assertEqual(d.e.f, some_f)
+        self.assertEqual(d.e.f.title, "other title")
+        
 class A:
     def __init__(self, b, c):
         self.b = b
