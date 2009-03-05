@@ -28,6 +28,11 @@ class TestResolveManyFilesDependency(BaseTest):
         assert("DAction" in class_names)
         assert("EAction" in class_names)
         
+
+        #print actions[0].b
+        #print actions[1].b
+        #print actions[2].b
+        
         for i in range(3):
             self.assertEqual(expected_title, actions[i].b.title)
             self.assertEqual(expected_title, actions[i].c.title)

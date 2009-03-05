@@ -2,7 +2,7 @@ from base_test import *
 from pyoc.config import *
 from pyoc.errors import *
 import os
-import classes_of_type
+from test_classes import classes_of_type
 
 class TestRegisterClassesOfType(BaseTest):
     

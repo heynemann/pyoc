@@ -53,12 +53,8 @@ class IoC:
         container.instances[cls] = instance
         return instance
     
-    @staticmethod
-    def resolve_all(property, *args, **kwargs):
-        container = IoC.get_instance()
-        return container._instantiate_all(property, args, kwargs)
-    
     def _instantiate(self, name, factory, factory_args, factory_kw):
+        #print "instantiating %s with %s" % (name, factory)
         if not callable(factory):
             logging.debug("Property %r: %s", name, factory)
             return factory
@@ -66,13 +62,21 @@ class IoC:
         orig_kwargs = self._prepare_kwargs(factory, factory_args, factory_kw)
         
         argument_list = get_argdefaults(factory)
-        kwargs = dict([(key, orig_kwargs[key]) for key in orig_kwargs.keys() if key in argument_list.keys()])
+        kwargs = dict([(key, orig_kwargs[key]) for key in orig_kwargs.keys() if key in argument_list.keys()])
+        #print orig_kwargs
+        #print argument_list
+        #print kwargs
+
         logging.debug("Property %r: %s(%s, %s)", name, factory.__name__,
                 factory_args, kwargs)
 
         instance =  factory(*factory_args, **kwargs)
-        print instance.all_classes[1]
         return instance
+    
+    @staticmethod
+    def resolve_all(property, *args, **kwargs):
+        container = IoC.get_instance()
+        return container._instantiate_all(property, args, kwargs)
     
     def _instantiate_all(self, property, *factory_args, **factory_kw):
         all_instances = []
@@ -85,7 +89,7 @@ class IoC:
 
         if (property in self.instances and lifestyle_type == "singleton"):
             return self.instances[property]
-        
+            
         for cls in all_classes:
             instance = self._instantiate("", cls, factory_args, factory_kw)
             all_instances.append(instance)
@@ -96,7 +100,7 @@ class IoC:
         return all_instances
     
     def _get(self, property, factory, factory_args, factory_kw):
-        """Lookups the given property name in context.
+        """Looks up the given property name in context.
         Raises KeyError when no such property is found.
         """
         if property not in self.config.components:
@@ -111,7 +115,7 @@ class IoC:
 
         if component_type != "indirect" and isinstance(component, (tuple, list, dict, set)):
             return component
-                
+        
         if (component_type != "indirect" and component in self.instances and lifestyle_type == "singleton"):
             return self.instances[component]
 
@@ -137,7 +141,9 @@ class IoC:
         The factory_kw could specify explicit keyword values.
         """
         defaults = get_argdefaults(factory, len(factory_args))
-		
+
+        #print "defaults for %s = %s with %d skipped items (%s %s)" % (factory, defaults, len(factory_args), factory_args, factory_kw)
+
         for arg, default in defaults.iteritems():
             if arg in factory_kw:
                 continue
