@@ -2,6 +2,7 @@
 import logging
 from errors import *
 from common import *
+import inspect
 
 class IoC:
     __instance = None
@@ -65,14 +66,15 @@ class IoC:
         orig_kwargs = self._prepare_kwargs(factory, factory_args, factory_kw)
         
         argument_list = get_argdefaults(factory)
-        kwargs = dict([(key, orig_kwargs[key]) for key in orig_kwargs.keys() if key in argument_list.keys()])
-            
+        kwargs = dict([(key, orig_kwargs[key]) for key in orig_kwargs.keys() if key in argument_list.keys()])
         logging.debug("Property %r: %s(%s, %s)", name, factory.__name__,
                 factory_args, kwargs)
-            
-        return factory(*factory_args, **kwargs)
+
+        instance =  factory(*factory_args, **kwargs)
+        print instance.all_classes[1]
+        return instance
     
-    def _instantiate_all(self, property, factory_args, factory_kw):
+    def _instantiate_all(self, property, *factory_args, **factory_kw):
         all_instances = []
         if property not in self.config.components:
             raise KeyError("No indirect component for: %s", property)
@@ -90,7 +92,7 @@ class IoC:
         
         if lifestyle_type == "singleton": 
             self.instances[property] = all_instances
-        
+                
         return all_instances
     
     def _get(self, property, factory, factory_args, factory_kw):
@@ -107,15 +109,22 @@ class IoC:
         if (property in self.instances and lifestyle_type == "singleton"):
             return self.instances[property]
 
-        if isinstance(component, (tuple, list, dict, set)):
+        if component_type != "indirect" and isinstance(component, (tuple, list, dict, set)):
             return component
-        
-        if (component in self.instances and lifestyle_type == "singleton"):
+                
+        if (component_type != "indirect" and component in self.instances and lifestyle_type == "singleton"):
             return self.instances[component]
 
-        kwargs = merge_dicts(factory_kw, kwargs)
-        
-        if component_type == "indirect": return self.instantiate_all(property, *args, **kwargs)
+        if (factory_kw != None and kwargs != None):
+            kwargs = merge_dicts(factory_kw, kwargs)
+        elif (factory_kw != None):
+            kwargs = factory_kw
+
+        if component_type == "indirect": 
+            if args == None: args = []
+            if kwargs == None: kwargs = {}
+            indirect_property = self._instantiate_all(property, *args, **kwargs)
+            return indirect_property
         
         instance = self._instantiate(property, *(component, args, kwargs))
         self.instances[property] = instance

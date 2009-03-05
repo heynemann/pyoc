@@ -22,9 +22,11 @@ class TestResolveManyFilesDependency(BaseTest):
         self.assertNotEqual(actions, None)
         self.assertEqual(len(actions), 3)
         
-        self.assertEqual(actions[0].__class__.__name__, "AAction")
-        self.assertEqual(actions[1].__class__.__name__, "DAction")
-        self.assertEqual(actions[2].__class__.__name__, "EAction")
+        class_names = [klass.__class__.__name__ for klass in actions]
+        
+        assert("AAction" in class_names)
+        assert("DAction" in class_names)
+        assert("EAction" in class_names)
         
         for i in range(3):
             self.assertEqual(expected_title, actions[i].b.title)

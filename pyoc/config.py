@@ -2,6 +2,7 @@ import common
 import os
 from errors import *
 import sys
+import inspect
 
 class BaseConfig(object):
     allowed_lifestyle_types = ("transient", "singleton",)
@@ -59,7 +60,7 @@ class BaseConfig(object):
         self.assert_valid_lifestyle_type(lifestyle_type)        
         
         all_classes = []
-        for module_path in common.locate("*_action.py", root=root_path):
+        for module_path in common.locate(pattern, root=root_path):
             module_name = os.path.splitext(os.path.split(module_path)[-1])[0]
             sys.path.insert(0,os.path.abspath(root_path))
             
@@ -73,6 +74,25 @@ class BaseConfig(object):
                                      % (class_name, module_name))
             
             all_classes.append(cls)
+        
+        component_definition = "indirect", lifestyle_type, all_classes, None, None
+        self.components[property] = component_definition
+    
+    def register_inheritors(self, property, root_path, base_type, lifestyle_type = "UNKNOWN"):
+        if (lifestyle_type == "UNKNOWN"): lifestyle_type = self.default_lifestyle_type
+        self.assert_valid_lifestyle_type(lifestyle_type)        
+        
+        all_classes = []
+        
+        for module_path in common.locate("*.py", root=root_path, recursive=False):
+            module_name = os.path.splitext(os.path.split(module_path)[-1])[0]
+            sys.path.insert(0,os.path.abspath(root_path))
+            module = __import__(module_name)
+            for name in dir(module):
+                cls = getattr(module, name)
+                if inspect.isclass(cls):
+                    if cls.__name__ == base_type.__name__ or base_type.__name__ in [klass.__name__ for klass in cls.__bases__]:
+                        all_classes.append(cls)
         
         component_definition = "indirect", lifestyle_type, all_classes, None, None
         self.components[property] = component_definition
