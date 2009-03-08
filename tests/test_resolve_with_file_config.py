@@ -16,7 +16,6 @@ class TestResolveWithFileConfig(BaseTest):
         self.assertNotEqual(a.b, None)
         self.assertEqual("B", a.b.__class__.__name__)
         self.assertEqual(expected_title, a.b.title)
-        
     
     def test_should_resolve_dependency_with_extra_argument(self):
         expected_title = "real title"
@@ -26,7 +25,7 @@ class TestResolveWithFileConfig(BaseTest):
         IoC.configure(config)
         
         b = B(expected_title)
-        a = IoC.resolve(A, b)
+        a = IoC.resolve(A, b = b)
         
         self.assertNotEqual(a, None)
         self.assertNotEqual(a.b, None)

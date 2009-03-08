@@ -1,6 +1,7 @@
 import common
 import os
-from errors import *
+import errors
+import reflection 
 import sys
 import inspect
 
@@ -20,23 +21,23 @@ class BaseConfig(object):
         
     def assert_valid_lifestyle_type(self, lifestyle_type):
         if lifestyle_type not in BaseConfig.allowed_lifestyle_types:
-            raise InvalidLifestyleTypeError("The specified lifestyle type (%s) is not valid. Allowed lifestyle types: %s" %
+            raise errors.InvalidLifestyleTypeError("The specified lifestyle type (%s) is not valid. Allowed lifestyle types: %s" %
                                             (lifestyle_type, ",".join(BaseConfig.allowed_lifestyle_types)))
         
     def assert_not_cyclical_dependency(self, property, component):
-        component_args = common.get_argdefaults(component).keys()
-        for component_arg in component_args:
-            if self.components.has_key(component_arg):
+        component_args, var_args, var_kwargs = reflection.get_arguments_for_method(component)
+        for component_arg in component_args.keys():
+            if component_arg in self.components:
                 parent_component_type, parent_lifestyle_type, parent_component, parent_args, parent_kwargs = self.components[component_arg]
                 if parent_component_type == "instance": return
-                parent_args = common.get_argdefaults(parent_component).keys()
+                parent_args, var_args, var_kwargs = reflection.get_arguments_for_method(parent_component)
                 if property in parent_args:
-                    raise CyclicalDependencyError("There is a cyclical dependency between %s and %s. Cyclical dependencies are not supported yet!"
+                    raise errors.CyclicalDependencyError("There is a cyclical dependency between %s and %s. Cyclical dependencies are not supported yet!"
                                                   % (component.__name__, parent_component.__name__))
                 
     def register(self, property, component, lifestyle_type = "UNKNOWN", *args, **kwargs):
         if (lifestyle_type == "UNKNOWN"): lifestyle_type = self.default_lifestyle_type
-        self.assert_valid_lifestyle_type(lifestyle_type)        
+        self.assert_valid_lifestyle_type(lifestyle_type)
         
         if (args or kwargs) and not callable(component):
             raise ValueError(
@@ -61,13 +62,10 @@ class BaseConfig(object):
         
         all_classes = []
         for module_path in common.locate(pattern, root=root_path):
-            module_name = os.path.splitext(os.path.split(module_path)[-1])[0]
-            sys.path.insert(0,os.path.abspath(root_path))
-            
-            module = __import__(module_name)
+            module = reflection.get_module_from_path(module_path)
             
             class_name = common.camel_case(module.__name__)
-            cls = getattr(module, class_name, None)
+            cls = reflection.get_class_for_module(module, class_name)
             
             if cls == None:
                 raise AttributeError("The class %s could not be found in file %s. Please make sure that the class has the same name as the file, but Camel Cased."
@@ -85,14 +83,11 @@ class BaseConfig(object):
         all_classes = []
         
         for module_path in common.locate("*.py", root=root_path, recursive=False):
-            module_name = os.path.splitext(os.path.split(module_path)[-1])[0]
-            sys.path.insert(0,os.path.abspath(root_path))
-            module = __import__(module_name)
-            for name in dir(module):
-                cls = getattr(module, name)
-                if inspect.isclass(cls):
-                    if cls.__name__ == base_type.__name__ or base_type.__name__ in [klass.__name__ for klass in cls.__bases__]:
-                        all_classes.append(cls)
+            module = reflection.get_module_from_path(module_path)            classes = reflection.get_classes_for_module(module)
+            
+            for cls in classes:
+                if cls.__name__ == base_type.__name__ or base_type.__name__ in [klass.__name__ for klass in cls.__bases__]:
+                    all_classes.append(cls)
         
         component_definition = "indirect", lifestyle_type, all_classes, None, None
         self.components[property] = component_definition
@@ -118,9 +113,7 @@ class FileConfig(BaseConfig):
         self.execute_config_file(root_path, filename)
     
     def execute_config_file(self, root_path, filename):
-        sys.path.insert(0,root_path)
-        module_name = os.path.splitext(filename)[0]
-        module = __import__(module_name)
+        module = reflection.get_module_from_path(os.path.join(root_path, filename))
         func = getattr(module, "config")
         config_helper = FileConfig.ContainerConfigHelper(self)
         func(config_helper)

@@ -33,7 +33,7 @@ class TestResolveDependency(BaseTest):
         IoC.configure(config)
         
         b = B(expected_title)
-        a = IoC.resolve(A, b)
+        a = IoC.resolve(A, b = b)
         
         self.assertNotEqual(a, None)
         self.assertNotEqual(a.b, None)
@@ -41,7 +41,7 @@ class TestResolveDependency(BaseTest):
         self.assertEqual(expected_title, a.b.title)
         
     def test_should_resolve_dependency_with_keyword_argument(self):
-        fake_expected_title = "some weird title"
+        fake_expected_title = "fake title"
         expected_title = "real title"
         
         config = InPlaceConfig()

@@ -13,12 +13,12 @@ class TestReflection(unittest.TestCase):
         self.module_path = os.path.join(os.path.split(__file__)[0], "test_reflection.py")
     
     def test_reflection_get_module_from_path(self):
-        module = ref.Reflection.get_module_from_path(self.module_path)
+        module = ref.get_module_from_path(self.module_path)
         assert(module.__name__ == "test_reflection")
         assert(module.return_something() == "something")
         
     def test_get_classes_for_module(self):
-        classes = ref.Reflection.get_classes_for_module(ref.Reflection.get_module_from_path(self.module_path))
+        classes = ref.get_classes_for_module(ref.get_module_from_path(self.module_path))
         assert(type(classes) == list)
         assert(len(classes) == 1)
         assert(classes[0].__name__ == TestReflection.__name__)
@@ -32,7 +32,7 @@ class TestReflection(unittest.TestCase):
         return "yet something else"
         
     def test_get_methods_for_class(self):
-        methods = ref.Reflection.get_methods_for_class(TestReflection)
+        methods = ref.get_methods_for_class(TestReflection)
         assert(type(methods) == list)
         assert(len(methods) > 0)
         func = getattr(self, "local_return_something") 
@@ -44,7 +44,7 @@ class TestReflection(unittest.TestCase):
         pass
         
     def test_get_arguments_with_defaults_for_method(self):
-        arguments_with_defaults, var_args, var_kwargs = ref.Reflection.get_arguments_for_method(getattr(self, "some_random_method"))
+        arguments_with_defaults, var_args, var_kwargs = ref.get_arguments_for_method(getattr(self, "some_random_method"))
         
         assert(type(arguments_with_defaults) == dict)
         assert(len(arguments_with_defaults) == 3)
@@ -60,6 +60,10 @@ class TestReflection(unittest.TestCase):
         assert(arguments_with_defaults["arg2"] == "default")
         assert(arguments_with_defaults["arg3"] == "default2")
     
+    def test_get_class_in_module(self):
+        klass = ref.get_class_for_module(ref.get_module_from_path(self.module_path), "TestReflection")
+        assert(klass.__name__ == TestReflection.__name__)
+        assert(klass.return_something() == "something else")
         
 if __name__ == '__main__':
     unittest.main()
