@@ -76,7 +76,7 @@ class BaseConfig(object):
         component_definition = "indirect", lifestyle_type, all_classes, None, None
         self.components[property] = component_definition
     
-    def register_inheritors(self, property, root_path, base_type, lifestyle_type = "UNKNOWN"):
+    def register_inheritors(self, property, root_path, base_type, lifestyle_type = "UNKNOWN", include_base = False):
         if (lifestyle_type == "UNKNOWN"): lifestyle_type = self.default_lifestyle_type
         self.assert_valid_lifestyle_type(lifestyle_type)        
         
@@ -86,7 +86,7 @@ class BaseConfig(object):
             module = reflection.get_module_from_path(module_path)            classes = reflection.get_classes_for_module(module)
             
             for cls in classes:
-                if cls.__name__ == base_type.__name__ or base_type.__name__ in [klass.__name__ for klass in cls.__bases__]:
+                if (include_base and cls.__name__ == base_type.__name__) or base_type.__name__ in [klass.__name__ for klass in cls.__bases__]:
                     all_classes.append(cls)
         
         component_definition = "indirect", lifestyle_type, all_classes, None, None
