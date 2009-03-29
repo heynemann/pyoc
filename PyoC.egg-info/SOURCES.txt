@@ -19,7 +19,6 @@ pyoc/common.py
 pyoc/config.py
 pyoc/errors.py
 pyoc/ioc.py
-pyoc/reflection.py
 tests/__init__.py
 tests/base_test.py
 tests/pyoc_config.py
