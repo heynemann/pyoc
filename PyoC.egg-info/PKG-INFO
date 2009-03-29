@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: PyoC
-Version: 0.1dev-r913
+Version: 0.1.1dev
 Summary: PyoC is an IoC container for Python projects
 Home-page: http://www.pyoc.org
 Author: Bernardo Heynemann
