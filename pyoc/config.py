@@ -86,7 +86,9 @@ class BaseConfig(object):
             module = reflection.get_module_from_path(module_path)            classes = reflection.get_classes_for_module(module)
             
             for cls in classes:
-                if (include_base and cls.__name__ == base_type.__name__) or base_type.__name__ in [klass.__name__ for klass in cls.__bases__]:
+                should_include = include_base and cls.__name__ == base_type.__name__
+                should_include = should_include or (cls.__bases__ is (list, tuple) and base_type.__name__ in [klass.__name__ for klass in cls.__bases__])
+                if should_include:
                     all_classes.append(cls)
         
         component_definition = "indirect", lifestyle_type, all_classes, None, None
