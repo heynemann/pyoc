@@ -87,7 +87,7 @@ class BaseConfig(object):
             
             for cls in classes:
                 should_include = include_base and cls.__name__ == base_type.__name__
-                should_include = should_include or (cls.__bases__ is (list, tuple) and base_type.__name__ in [klass.__name__ for klass in cls.__bases__])
+                should_include = should_include or (isinstance(cls.__bases__,(list,tuple)) and base_type.__name__ in [klass.__name__ for klass in cls.__bases__])
                 if should_include:
                     all_classes.append(cls)
         
