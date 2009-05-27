@@ -5,7 +5,7 @@ import os
 from test_classes import classes_of_type
 
 class TestRegisterClassesOfType(BaseTest):
-    
+
     def test_should_resolve_all_inheritors(self):
         config = InPlaceConfig()
         config.register_inheritors("all_classes", os.path.join(os.curdir, "test_classes"), classes_of_type.Base)
